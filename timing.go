@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"flag"
 	"fmt"
+	"github.com/VinkDong/asset-alarm/log"
+	"gopkg.in/yaml.v2"
 )
 
 const CLR_0 = "\x1b[30;1m"
@@ -18,15 +20,26 @@ const CLR_W = "\x1b[37;1m"
 const VERSION = "v0.1.0"
 
 var (
-	conf = flag.String("conf","","Timing request config file")
-	help = flag.Bool("help",false,"Show help information")
-	prometheus = flag.Bool("metrics",false,"Provide prometheus metrics")
+	conf       = flag.String("conf", "", "Timing request config file")
+	help       = flag.Bool("help", false, "Show help information")
+	prometheus = flag.Bool("metrics", false, "Provide prometheus metrics")
 )
-func main()  {
+
+type Rule struct {
+	Method string
+	Url    string
+	Bodies map[string]string
+	Range  map[string]map[string]int
+	Every  map[string]int
+}
+
+func main() {
 	flag.Parse()
-	if *help == true{
+	if *help == true {
 		showHelp()
 	}
+	r := &Rule{}
+	parseYaml(r, *conf)
 }
 
 func showHelp() {
@@ -38,8 +51,15 @@ Need more refer at  %shttps://github.com/VinkDong/TimingRequest%s
 `, CLR_Y, CLR_N, CLR_C, CLR_N)
 }
 
-func parseYaml(filePath string){
-
+func parseYaml(r *Rule, filePath string) {
+	data, err := readFile(filePath)
+	if err != nil {
+		log.Errorf("Read config file %s error", filePath)
+	}
+	err = yaml.Unmarshal(data, &r)
+	if err != nil {
+		log.Errorf("Parse config %s error", filePath)
+	}
 }
 
 func readFile(filePath string) ([]byte, error) {

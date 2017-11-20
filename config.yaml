@@ -3,23 +3,23 @@ url: vinkdong.com:1234/receive
 method: PUT
 body:
   bodyone: |
-  {
-    "properties": {
-      "ServerIP": {
-        "type":     "text",
-        "fielddata": true
+    {
+      "properties": {
+        "ServerIP": {
+          "type":     "text",
+          "fielddata": true
+        }
       }
     }
-  }
   bodytwo: |
-  {
-    "properties": {
-      "ServerIP": {
-        "type":     "text",
-        "fielddata": true
+    {
+      "properties": {
+        "ServerIP": {
+          "type":     "text",
+          "fielddata": true
+        }
       }
     }
-  }
 range:
   hour:
     gte: 7
