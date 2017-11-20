@@ -1,5 +1,5 @@
 ---
-url: vinkdong.com:1234/receive
+url: http://example.com/receive
 method: PUT
 body:
   bodyone: |
@@ -22,7 +22,7 @@ body:
     }
 range:
   hour:
-    gte: 7
-    let: 13
+    gte: 10
+    lte: 13
 run_every:
   seconds: 10
