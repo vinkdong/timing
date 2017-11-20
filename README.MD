@@ -28,7 +28,7 @@ Timing Request is used for send http request timing
   - range: specail time you want to send request, you can use only `hour` from now,then you can use `gt`,`lt`,`gte`,`lte` and `eq` as condition,they're <span style="color:red">AND</span> relationship
   - run_every: interval time for wait next request, you can use `seconds`,`minutes`,`hours` and `days`,if there have 2 or more, they're <span style="color:red">AND</span> relationship too.
 
-- start program
+- start program
 
     ```bash
     ./TimingRequest --conf path/your/config
@@ -43,7 +43,7 @@ you can monitoring this process via prometheus, this is a experimental
 - start with prometheus monitoring
 
     ```bash
-    .TimingRequest --conf path/your/config -metrics --port 9800
+    .TimingRequest --conf path/your/config -enable_metrics --addr :9800
     ```
 
 - then your can scape metrics by prometheus

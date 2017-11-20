@@ -22,7 +22,7 @@ body:
     }
 range:
   hour:
-    gte: 10
+    gte: 12
     lte: 13
 run_every:
-  seconds: 10
+  seconds: 30

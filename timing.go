@@ -9,6 +9,9 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/client_golang/prometheus"
+	"strconv"
 )
 
 const CLR_0 = "\x1b[30;1m"
@@ -25,7 +28,9 @@ const VERSION = "v0.1.0"
 var (
 	conf       = flag.String("conf", "", "Timing request config file")
 	help       = flag.Bool("help", false, "Show help information")
-	prometheus = flag.Bool("metrics", false, "Provide prometheus metrics")
+	enable_metrics = flag.Bool("enable_metrics", false, "Provide prometheus metrics")
+	addr       = flag.String("addr", ":9800", "The address to listen on for HTTP requests.")
+
 )
 
 type Rule struct {
@@ -34,20 +39,40 @@ type Rule struct {
 	Bodies map[string]string `yaml:"body"`
 	Range  map[string]map[string]int
 	Every  map[string]int `yaml:"run_every"`
+	Prometheus map[string]string
 }
 
+var (
+	httpSendSuccess = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Help: "HTTP send success counter",
+			Name: "http_send_success"}, []string{"url", "method", "entity", "respCode"})
+	httpSendFail = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Help: "HTTP send fail counter",
+			Name: "http_send_fail"}, []string{"url", "method", "entity", "respCode"})
+)
+
+func prometheusInit() {
+	prometheus.MustRegister(httpSendSuccess)
+	prometheus.MustRegister(httpSendFail)
+}
 func main() {
 	flag.Parse()
 	if *help == true {
 		showHelp()
 	}
 	r := &Rule{}
+	if *enable_metrics{
+		go startPrometheus()
+		prometheusInit()
+	}
 	parseYaml(r, *conf)
 	for {
 		if checkTimeIn(r) {
 			for body := range r.Bodies {
 				log.Infof("sending to %s ... ", r.Url)
-				sendRequest(r.Method, r.Url, r.Bodies[body])
+				sendRequest(r.Method, r.Url, r.Bodies[body],body)
 			}
 		}
 		d := getSleepTime(r)
@@ -121,7 +146,7 @@ func checkCondition(current int, condition map[string]int) bool {
 	return true
 }
 
-func sendRequest(method,url,body string){
+func sendRequest(method,url,body,entity string){
 	client  := &http.Client{}
 	req, err := http.NewRequest(method,url,strings.NewReader(body))
 	if err != nil {
@@ -131,9 +156,18 @@ func sendRequest(method,url,body string){
 	resp, err := client.Do(req)
 	if err != nil{
 		log.Error(err)
+		httpSendFail.WithLabelValues(url, method, entity, "CLIENT_ERR_019")
 		return
 	}
-	data , err := ioutil.ReadAll(resp.Body)
+	resqCode := resp.StatusCode
+	if *enable_metrics {
+		if resqCode >= 200 && resqCode < 400 {
+			httpSendSuccess.WithLabelValues(url, method, entity, strconv.Itoa(resqCode)).Inc()
+		} else {
+			httpSendFail.WithLabelValues(url, method, entity, strconv.Itoa(resqCode)).Inc()
+		}
+	}
+	data, err := ioutil.ReadAll(resp.Body)
 	log.Infof("%s",data)
 }
 
@@ -159,4 +193,9 @@ func parseYaml(r *Rule, filePath string) {
 
 func readFile(filePath string) ([]byte, error) {
 	return ioutil.ReadFile(filePath)
+}
+
+func startPrometheus()  {
+	http.Handle("/metrics", promhttp.Handler())
+	log.Info(http.ListenAndServe(*addr, nil))
 }
