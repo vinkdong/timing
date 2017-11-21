@@ -1,6 +1,6 @@
 # Timing Request
 
-## Introduce
+## Introduction
 
 Timing Request is used for send http request timing
 
@@ -25,8 +25,8 @@ Timing Request is used for send http request timing
   - url: address you want requested
   - method: request method you need
   - body: request body, if you have 2 or more bodies it will send with difference body
-  - range: specail time you want to send request, you can use only `hour` from now,then you can use `gt`,`lt`,`gte`,`lte` and `eq` as condition,they're <span style="color:red">AND</span> relationship
-  - run_every: interval time for wait next request, you can use `seconds`,`minutes`,`hours` and `days`,if there have 2 or more, they're <span style="color:red">AND</span> relationship too.
+  - range: special time period you want to send request, you can use only `hour` from now,then you can use `gt`,`lt`,`gte`,`lte` and `eq` as condition,they're <span style="color:red">AND</span> relationship,Time is <span style="color:red">UTC</span> time
+  - run_every: interval time for wait next request, you can use `seconds`,`minutes`,`hours` and `days`,if there have 2 or more, they're <span style="color:red">AND</span> relationship too.
 
 - start program
 
