@@ -1,0 +1,31 @@
+version: 2
+jobs:
+   build:
+     docker:
+       - image: circleci/golang:1.8
+     working_directory: /go/src/github.com/VinkDong/TimingRequest
+
+     steps:
+       - checkout
+    
+       - run: go get -d
+       - run: go build -o timing
+
+       - setup_remote_docker:
+           version: 17.05.0-ce
+
+       - run: |
+            docker build -t hand/timing .
+            docker login -u $REPO_USER -p $REPO_PASS
+            docker push hand/timing
+
+test:
+   build:
+     docker:
+       - image: circleci/golang:1.8.1
+     steps:
+       - checkout
+       - run:
+             name: Test
+             command: go test -v ./...
+    
