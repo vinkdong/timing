@@ -12,6 +12,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/client_golang/prometheus"
 	"strconv"
+	"bytes"
+	"os"
 )
 
 const CLR_0 = "\x1b[30;1m"
@@ -62,20 +64,29 @@ func main() {
 	if *help == true {
 		showHelp()
 	}
-	r := &Rule{}
+	ruleList := make([]Rule,0)
 	if *enable_metrics{
 		go startPrometheus()
 		prometheusInit()
 	}
-	parseYaml(r, *conf)
+	parseYaml(&ruleList, *conf)
+	for _, r := range ruleList {
+		go dealSend(r)
+	}
+	for{
+		time.Sleep(time.Hour*10)
+	}
+}
+
+func dealSend(r Rule)  {
 	for {
-		if checkTimeIn(r) {
+		if checkTimeIn(&r) {
 			for body := range r.Bodies {
 				log.Infof("sending to %s ... ", r.Url)
 				sendRequest(r.Method, r.Url, r.Bodies[body],body)
 			}
 		}
-		d := getSleepTime(r)
+		d := getSleepTime(&r)
 		log.Infof("sleepy for %s",d.String())
 		time.Sleep(d)
 	}
@@ -180,14 +191,20 @@ Need more refer at  %shttps://github.com/VinkDong/TimingRequest%s
 `, CLR_Y, CLR_N, CLR_C, CLR_N)
 }
 
-func parseYaml(r *Rule, filePath string) {
+func parseYaml(rList *[]Rule, filePath string) {
 	data, err := readFile(filePath)
 	if err != nil {
 		log.Errorf("Read config file %s error", filePath)
 	}
-	err = yaml.Unmarshal(data, &r)
-	if err != nil {
-		log.Errorf("Parse config %s error", filePath)
+	dataList := bytes.Split(data, []byte("\n---"))
+	for _, single := range dataList {
+		r := Rule{}
+		err = yaml.Unmarshal(single, &r)
+		if err != nil {
+			log.Errorf("Parse config %s error", filePath)
+			os.Exit(128)
+		}
+		*rList = append(*rList, r)
 	}
 }
 

@@ -22,7 +22,23 @@ body:
     }
 range:
   hour:
-    gte: 12
+    gte: 0
     lte: 13
+run_every:
+  seconds: 30
+
+---
+url: http://example2.com/receive
+method: Get
+body:
+  bodyone2: |
+    {
+      "properties": {
+        "ServerIP": {
+          "type":     "text",
+          "fielddata": true
+        }
+      }
+    }
 run_every:
   seconds: 30
