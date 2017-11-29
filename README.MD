@@ -25,7 +25,7 @@ Timing Request is used for send http request timing
   - url: address you want requested
   - method: request method you need
   - body: request body, if you have 2 or more bodies it will send with difference body
-  - range: special time period you want to send request, you can use only `hour` from now,then you can use `gt`,`lt`,`gte`,`lte` and `eq` as condition,they're <span style="color:red">AND</span> relationship,Time is <span style="color:red">UTC</span> time
+  - range: special time period you want to send request, you can use `hour`,`minute`,`second`,`month` and `weekday`, from now,then you can use `gt`,`lt`,`gte`,`lte` and `eq` as condition,they're <span style="color:red">AND</span> relationship,Time is <span style="color:red">UTC</span> time, and Sunday in weekday is `0`, Monday is `1` by parity of reasoning.
   - run_every: interval time for wait next request, you can use `seconds`,`minutes`,`hours` and `days`,if there have 2 or more, they're <span style="color:red">AND</span> relationship too.
 
   in additional, you can use multi yaml split `---` as multi request entities

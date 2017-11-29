@@ -40,5 +40,15 @@ body:
         }
       }
     }
+range:
+  hour:
+    gte: 8
+    lte: 13
+  month:
+    gte: 10
+    lte: 11
+  weekday:
+    gte: 0
+    lte: 3
 run_every:
   seconds: 30

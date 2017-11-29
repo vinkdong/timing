@@ -112,6 +112,22 @@ func getSleepTime(r *Rule) time.Duration {
 
 func checkTimeIn(r *Rule) bool{
 	current := time.Now().UTC()
+	if rH := r.Range["month"]; rH != nil {
+		currentMonth := int(current.Month())
+		if !checkCondition(currentMonth, rH){
+			log.Infof("month %d not in request period",currentMonth)
+			return false
+		}
+
+	}
+	if rH := r.Range["weekday"]; rH != nil {
+		currentWeekday := int(current.Weekday())
+		if !checkCondition(currentWeekday, rH){
+			log.Infof("weekday %d not in request period",currentWeekday)
+			return false
+		}
+
+	}
 	if rH := r.Range["hour"]; rH != nil {
 		currentHour := current.Hour()
 		if !checkCondition(currentHour, rH){
@@ -119,6 +135,20 @@ func checkTimeIn(r *Rule) bool{
 			return false
 		}
 
+	}
+	if rH := r.Range["minute"]; rH != nil {
+		currentMinute := current.Minute()
+		if !checkCondition(currentMinute, rH){
+			log.Infof("minute %d not in request period",currentMinute)
+			return false
+		}
+	}
+	if rH := r.Range["second"]; rH != nil {
+		currentSecond := current.Second()
+		if !checkCondition(currentSecond, rH){
+			log.Infof("second %d not in request period",currentSecond)
+			return false
+		}
 	}
 	return true
 }
