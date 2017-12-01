@@ -1,5 +1,7 @@
 # Timing Request
 
+[![Circle CI](https://circleci.com/gh/VinkDong/TimingRequest/tree/master.svg?style=shield)](https://circleci.com/gh/VinkDong/TimingRequest/tree/master)
+
 ## Introduction
 
 Timing Request is used for send http request timing
