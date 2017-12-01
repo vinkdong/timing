@@ -57,9 +57,9 @@ func ProcessMiddleware(err error, resp *http.Response, r types.Rule, entity stri
 	if sysEnableMetrics {
 		if resqCode >= 200 && resqCode < 400 {
 			httpSendSuccess.WithLabelValues(url, method, entity, strconv.Itoa(resqCode)).Inc()
-			reqDurationHistogram.WithLabelValues(r.Url,r.Method,entity,strconv.Itoa(resqCode)).Observe(time.Since(start).Seconds())
 		} else {
 			httpSendFail.WithLabelValues(url, method, entity, strconv.Itoa(resqCode)).Inc()
 		}
+		reqDurationHistogram.WithLabelValues(r.Url,r.Method,entity,strconv.Itoa(resqCode)).Observe(time.Since(start).Seconds())
 	}
 }

@@ -1,9 +1,12 @@
 package main
 
-import "testing"
+import (
+	"testing"
+	"github.com/VinkDong/TimingRequest/types"
+)
 
 func TestParseYaml(t *testing.T) {
-	rList := make([]Rule,0)
+	rList := make([]types.Rule,0)
 	parseYaml(&rList,"./config.yaml")
 	r := rList[0]
 	if r.Method != "PUT"{
