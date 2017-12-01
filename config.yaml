@@ -20,6 +20,7 @@ body:
         }
       }
     }
+log_response: true
 range:
   hour:
     gte: 0
@@ -28,7 +29,7 @@ run_every:
   seconds: 30
 
 ---
-url: http://example2.com/receive
+url: http://example2.com
 method: Get
 body:
   bodyone2: |
@@ -42,13 +43,12 @@ body:
     }
 range:
   hour:
-    gte: 8
+    gte: 5
     lte: 13
   month:
     gte: 10
-    lte: 11
+    lte: 12
   weekday:
-    gte: 0
-    lte: 3
+    eq: 5
 run_every:
   seconds: 30
