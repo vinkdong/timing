@@ -12,6 +12,7 @@ import (
 	"bytes"
 	"os"
 	"github.com/VinkDong/TimingRequest/middlewares"
+	"github.com/VinkDong/TimingRequest/types"
 )
 
 const CLR_0 = "\x1b[30;1m"
@@ -30,18 +31,11 @@ var (
 	help       = flag.Bool("help", false, "Show help information")
 	enableMetrics = flag.Bool("enable_metrics", false, "Provide prometheus metrics")
 	addr       = flag.String("addr", ":9800", "The address to listen on for HTTP requests.")
+	buckets    = flag.String("buckets", "0.1, 0.3, 1.2, 5.0", "Buckets holds Prometheus Buckets")
 
 )
 
-type Rule struct {
-	Method     string
-	Url        string
-	Bodies     map[string]string `yaml:"body"`
-	Range      map[string]map[string]int
-	Every      map[string]int    `yaml:"run_every"`
-	LogResp    bool              `yaml:"log_response"`
-	Prometheus map[string]string
-}
+
 
 
 func main() {
@@ -49,8 +43,8 @@ func main() {
 	if *help == true {
 		showHelp()
 	}
-	ruleList := make([]Rule,0)
-	middlewares.InitMiddleware(enableMetrics,addr)
+	ruleList := make([]types.Rule,0)
+	middlewares.InitMiddleware(enableMetrics,addr,buckets)
 	parseYaml(&ruleList, *conf)
 	for _, r := range ruleList {
 		go dealSend(r)
@@ -60,7 +54,7 @@ func main() {
 	}
 }
 
-func dealSend(r Rule)  {
+func dealSend(r types.Rule)  {
 	for {
 		if checkTimeIn(&r) {
 			for body := range r.Bodies {
@@ -74,7 +68,7 @@ func dealSend(r Rule)  {
 	}
 }
 
-func getSleepTime(r *Rule) time.Duration {
+func getSleepTime(r *types.Rule) time.Duration {
 	every := r.Every
 	var duration time.Duration
 	if val, ok := every["seconds"]; ok {
@@ -92,7 +86,7 @@ func getSleepTime(r *Rule) time.Duration {
 	return duration
 }
 
-func checkTimeIn(r *Rule) bool{
+func checkTimeIn(r *types.Rule) bool{
 	current := time.Now().UTC()
 	if rH := r.Range["month"]; rH != nil {
 		currentMonth := int(current.Month())
@@ -169,7 +163,7 @@ func checkCondition(current int, condition map[string]int) bool {
 	return true
 }
 
-func sendRequest(r Rule, entity string) {
+func sendRequest(r types.Rule, entity string) {
 	client := &http.Client{}
 	body := r.Bodies[entity]
 	req, err := http.NewRequest(r.Method, r.Url, strings.NewReader(body))
@@ -177,10 +171,14 @@ func sendRequest(r Rule, entity string) {
 		log.Error(err)
 		return
 	}
+	start := time.Now()
 	resp, err := client.Do(req)
-	middlewares.ProcessMiddleware(err, resp, r, entity)
+	middlewares.ProcessMiddleware(err, resp, r, entity, start)
+	if err != nil {
+		return
+	}
 	data, err := ioutil.ReadAll(resp.Body)
-	if r.LogResp{
+	if r.LogResp {
 		log.Infof("%s", data)
 	}
 }
@@ -194,14 +192,14 @@ Need more refer at  %shttps://github.com/VinkDong/TimingRequest%s
 `, CLR_Y, CLR_N, CLR_C, CLR_N)
 }
 
-func parseYaml(rList *[]Rule, filePath string) {
+func parseYaml(rList *[]types.Rule, filePath string) {
 	data, err := readFile(filePath)
 	if err != nil {
 		log.Errorf("Read config file %s error", filePath)
 	}
 	dataList := bytes.Split(data, []byte("\n---"))
 	for _, single := range dataList {
-		r := Rule{}
+		r := types.Rule{}
 		err = yaml.Unmarshal(single, &r)
 		if err != nil {
 			log.Errorf("Parse config %s error", filePath)
