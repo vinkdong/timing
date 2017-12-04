@@ -1,6 +1,9 @@
 ---
 url: http://example.com/receive
 method: PUT
+header:
+  Accept: application/json, text/plain, */*
+  Referer: http://vinkdong.com/
 body:
   bodyone: |
     {
@@ -31,6 +34,9 @@ run_every:
 ---
 url: https://vinkdong.com
 method: GET
+header:
+  Accept: application/json, text/plain, */*
+  Referer: http://vinkdong.com/
 body:
   bodyone2: |
     {

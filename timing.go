@@ -91,7 +91,7 @@ func checkTimeIn(r *types.Rule) bool{
 	if rH := r.Range["month"]; rH != nil {
 		currentMonth := int(current.Month())
 		if !checkCondition(currentMonth, rH){
-			log.Infof("month %d not in request period",currentMonth)
+			r.LogNotIn("month")
 			return false
 		}
 
@@ -99,7 +99,7 @@ func checkTimeIn(r *types.Rule) bool{
 	if rH := r.Range["weekday"]; rH != nil {
 		currentWeekday := int(current.Weekday())
 		if !checkCondition(currentWeekday, rH){
-			log.Infof("weekday %d not in request period",currentWeekday)
+			r.LogNotIn("weekday")
 			return false
 		}
 
@@ -107,7 +107,7 @@ func checkTimeIn(r *types.Rule) bool{
 	if rH := r.Range["hour"]; rH != nil {
 		currentHour := current.Hour()
 		if !checkCondition(currentHour, rH){
-			log.Infof("hour %d not in request period",currentHour)
+			r.LogNotIn("hour")
 			return false
 		}
 
@@ -115,14 +115,14 @@ func checkTimeIn(r *types.Rule) bool{
 	if rH := r.Range["minute"]; rH != nil {
 		currentMinute := current.Minute()
 		if !checkCondition(currentMinute, rH){
-			log.Infof("minute %d not in request period",currentMinute)
+			r.LogNotIn("minute")
 			return false
 		}
 	}
 	if rH := r.Range["second"]; rH != nil {
 		currentSecond := current.Second()
 		if !checkCondition(currentSecond, rH){
-			log.Infof("second %d not in request period",currentSecond)
+			r.LogNotIn("second")
 			return false
 		}
 	}
@@ -167,6 +167,9 @@ func sendRequest(r types.Rule, entity string) {
 	client := &http.Client{}
 	body := r.Bodies[entity]
 	req, err := http.NewRequest(r.Method, r.Url, strings.NewReader(body))
+	for k , v := range r.Headers{
+		req.Header.Set(k,v)
+	}
 	if err != nil {
 		log.Error(err)
 		return
