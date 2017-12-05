@@ -21,7 +21,7 @@ Timing Request is used for send http request timing
     ```
 
 - edit config file
-  
+
   you can find a example conf file at [`./config.yaml`](https://github.com/VinkDong/TimingRequest/blob/master/config.yaml), config file is under the yaml format you can use follow keys:
 
   - url: address you want requested
@@ -50,6 +50,10 @@ you can monitoring this process via prometheus, this is a experimental
     ```bash
     .TimingRequest --conf path/your/config -enable_metrics --addr :9800
     ```
+
+- additional arguments
+
+  - buckets: prometheus buckets, default is `0.1, 0.3, 1.2, 5.0`
 
 - then your can scape metrics by prometheus
 
