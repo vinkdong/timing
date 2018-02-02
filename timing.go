@@ -4,15 +4,15 @@ import (
 	"io/ioutil"
 	"flag"
 	"fmt"
-	"github.com/VinkDong/asset-alarm/log"
+	"github.com/vinkdong/asset-alarm/log"
 	"gopkg.in/yaml.v2"
 	"net/http"
 	"strings"
 	"time"
 	"bytes"
 	"os"
-	"github.com/VinkDong/TimingRequest/middlewares"
-	"github.com/VinkDong/TimingRequest/types"
+	"github.com/vinkdong/timing/middlewares"
+	"github.com/vinkdong/timing/types"
 )
 
 const CLR_0 = "\x1b[30;1m"

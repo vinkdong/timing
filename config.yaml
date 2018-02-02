@@ -30,6 +30,9 @@ range:
     lte: 13
 run_every:
   seconds: 30
+check:
+  - type: json
+    rule: this is rules
 
 ---
 url: https://vinkdong.com

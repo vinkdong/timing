@@ -3,9 +3,9 @@ package middlewares
 import (
 	"net/http"
 	"strconv"
-	"github.com/VinkDong/asset-alarm/log"
+	"github.com/vinkdong/asset-alarm/log"
 	"strings"
-	"github.com/VinkDong/TimingRequest/types"
+	"github.com/vinkdong/timing/types"
 	"time"
 )
 

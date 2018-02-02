@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/VinkDong/asset-alarm/log"
+	"github.com/vinkdong/asset-alarm/log"
 )
 
 type Rule struct {
@@ -13,6 +13,12 @@ type Rule struct {
 	Every      map[string]int    `yaml:"run_every"`
 	LogResp    bool              `yaml:"log_response"`
 	Prometheus map[string]string
+	Check      []Check           `yaml: "check"`
+}
+
+type Check struct {
+	Type string `yaml:"type"`
+	Rule string `yaml:"rule"`
 }
 
 func (r *Rule) LogNotIn(period string) {
