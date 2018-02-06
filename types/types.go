@@ -33,9 +33,12 @@ type Context struct {
 }
 
 type Database struct {
-	Type string
-	Host string
-	Port int16
+	Type     string
+	Host     string
+	Port     int16
+	Username string
+	Password string
+	Database string
 }
 
 type TSql struct {

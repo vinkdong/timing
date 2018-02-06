@@ -25,16 +25,20 @@ func (m *MysqlMiddleware) Init(rule types.Rule) {
 }
 
 func (m *MysqlMiddleware) Process() {
-
+	m.init()
+	defer m.db.Close()
+	for _, sql := range m.Rule.Sql.Execute {
+		m.Execute(sql)
+	}
 }
 
 func (m *MysqlMiddleware) init() {
+	dbConfig := m.Rule.Database
 	db, err := sql.Open("mysql", fmt.Sprintf(mysqlConnectScheme,
-		m.Username, m.Password, m.Host, m.Port, m.Database))
+		dbConfig.Username, dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.Database))
 	if err != nil {
 		panic(err.Error())
 	}
-	defer db.Close()
 	m.db = db
 }
 
@@ -42,6 +46,8 @@ func (m *MysqlMiddleware) Execute(sql string) sql.Result {
 	result, err := m.db.Exec(sql)
 	if err != nil {
 		log.Error(err.Error())
+	}else {
+		log.Info("executed")
 	}
 	return result
 }
