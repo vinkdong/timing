@@ -72,6 +72,7 @@ database:
   host: rds.vk.vu
   port: 3306
   database: d01
-execute:
-  - table: t01
-    execute:
+sql:
+  execute:
+    - INSERT INTO t01 (name, date) VALUES ("zhans",NOW());
+  query:

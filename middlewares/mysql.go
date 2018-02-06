@@ -16,8 +16,10 @@ type MysqlMiddleware struct {
 	db       *sql.DB
 }
 
+const mysqlConnectScheme  = "%s:%s@tcp(%s:%d)/%s"
+
 func (m *MysqlMiddleware) init() {
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s",
+	db, err := sql.Open("mysql", fmt.Sprintf(mysqlConnectScheme,
 		m.Username, m.Password, m.Host, m.Port, m.Database))
 	if err != nil {
 		panic(err.Error())

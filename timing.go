@@ -179,6 +179,7 @@ func parseYaml(rList *[]types.Rule, filePath string) {
 	for _, single := range dataList {
 		r := types.Rule{}
 		err = yaml.Unmarshal(single, &r)
+		fmt.Println(err)
 		if err != nil {
 			log.Errorf("Parse config %s error", filePath)
 			os.Exit(128)

@@ -18,12 +18,26 @@ type Rule struct {
 	Every      map[string]int    `yaml:"run_every"`
 	LogResp    bool              `yaml:"log_response"`
 	Prometheus map[string]string
-	Check      []Checker          `yaml: "checker"`
+	Check      []Checker         `yaml: "checker"`
+	Type       string
+	Database   Database          `yaml:"database"`
+	Sql        TSql              `yaml: "sql"`
+}
+
+type Database struct {
+	Type string
+	Host string
+	Port int16
+}
+
+type TSql struct {
+	Execute []string
+	Query   []string
 }
 
 type Checker struct {
-	Type string `yaml:"type"`
-	Name string `yaml:"name"`
+	Type string   `yaml:"type"`
+	Name string   `yaml:"name"`
 	Rule []string `yaml:"rule"`
 }
 
