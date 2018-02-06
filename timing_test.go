@@ -2,7 +2,7 @@ package main
 
 import (
 	"testing"
-	"github.com/VinkDong/TimingRequest/types"
+	"github.com/vinkdong/timing/types"
 )
 
 func TestParseYaml(t *testing.T) {

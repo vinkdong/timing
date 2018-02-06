@@ -3,12 +3,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/VinkDong/TimingRequest"
-  packages = ["types"]
-  revision = "d577b792cdb7d51589392dc17b7d6ad8fd5153a3"
-
-[[projects]]
-  branch = "master"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
   revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
@@ -18,6 +12,12 @@
   packages = ["."]
   revision = "aabad6e819789e569bd6aabf444c935aa9ba1e44"
   version = "v0.5.0"
+
+[[projects]]
+  name = "github.com/go-sql-driver/mysql"
+  packages = ["."]
+  revision = "a0583e0143b1624142adab07e0e97fe106d99561"
+  version = "v1.3"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -69,12 +69,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/vinkdong/asset-alarm"
-  packages = ["log"]
-  revision = "feed0e7d6a08dd5e6ce7ed93f52937e870e70cd5"
-
-[[projects]]
-  branch = "master"
   name = "github.com/vinkdong/gox"
   packages = ["log"]
   revision = "2400a7674668caac3b81f8d5c14d0b451121ec1a"
@@ -88,6 +82,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d7f3484942db0b0c9b79b510d9b449bbb09a6155d0647896a96b8f3043bae5be"
+  inputs-digest = "615828bcc05ac30b7183dbdb021e16f00abcc86fbe07bdb36e096c7d43bb7adb"
   solver-name = "gps-cdcl"
   solver-version = 1

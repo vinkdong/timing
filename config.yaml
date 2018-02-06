@@ -64,3 +64,14 @@ range:
     lte: 5
 run_every:
   seconds: 30
+
+---
+type: database
+database:
+  type: mysql
+  host: rds.vk.vu
+  port: 3306
+  database: d01
+execute:
+  - table: t01
+    execute:

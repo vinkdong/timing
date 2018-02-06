@@ -7,7 +7,6 @@ import (
 
 func TestChecker_CheckJson(t *testing.T) {
 	c := Checker{
-		Rule: `{{ $.status eq "green" }}`,
 		Name: "test_check",
 		Type: "json",
 	}

@@ -4,10 +4,8 @@ import (
 	"io/ioutil"
 	"flag"
 	"fmt"
-	"github.com/vinkdong/asset-alarm/log"
+	"github.com/vinkdong/gox/log"
 	"gopkg.in/yaml.v2"
-	"net/http"
-	"strings"
 	"time"
 	"bytes"
 	"os"
@@ -54,16 +52,14 @@ func main() {
 	}
 }
 
-func dealSend(r types.Rule)  {
+func dealSend(r types.Rule) {
 	for {
 		if checkTimeIn(&r) {
-			for body := range r.Bodies {
-				log.Infof("sending to %s ... ", r.Url)
-				sendRequest(r,body)
-			}
+			s := middlewares.HttpMiddleware{Rule: r}
+			s.Process()
 		}
 		d := getSleepTime(&r)
-		log.Infof("sleepy for %s",d.String())
+		log.Infof("sleepy for %s", d.String())
 		time.Sleep(d)
 	}
 }
@@ -163,28 +159,7 @@ func checkCondition(current int, condition map[string]int) bool {
 	return true
 }
 
-func sendRequest(r types.Rule, entity string) {
-	client := &http.Client{}
-	body := r.Bodies[entity]
-	req, err := http.NewRequest(r.Method, r.Url, strings.NewReader(body))
-	for k , v := range r.Headers{
-		req.Header.Set(k,v)
-	}
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	start := time.Now()
-	resp, err := client.Do(req)
-	middlewares.ProcessMiddleware(err, resp, r, entity, start)
-	if err != nil {
-		return
-	}
-	data, err := ioutil.ReadAll(resp.Body)
-	if r.LogResp {
-		log.Infof("%s", data)
-	}
-}
+
 
 func showHelp() {
 	fmt.Printf(`%sTiming Request %sis used send request by timing
