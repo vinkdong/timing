@@ -16,12 +16,20 @@ type Rule struct {
 	Headers    map[string]string `yaml:"header"`
 	Range      map[string]map[string]int
 	Every      map[string]int    `yaml:"run_every"`
+	Count      int64             `yaml:"run_count"`
+	Thread     int16             `yaml:"run_thread"`
 	LogResp    bool              `yaml:"log_response"`
 	Prometheus map[string]string
 	Check      []Checker         `yaml: "checker"`
 	Type       string
 	Database   Database          `yaml:"database"`
 	Sql        TSql              `yaml: "sql"`
+	*Context
+}
+
+type Context struct {
+	Executed int64
+	Skip     bool
 }
 
 type Database struct {

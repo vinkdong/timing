@@ -14,6 +14,10 @@ type HttpMiddleware struct {
 	Rule types.Rule
 }
 
+func (hm *HttpMiddleware) Init(rule types.Rule) {
+	hm.Rule = rule
+}
+
 func (hm *HttpMiddleware) Process() {
 	for body := range hm.Rule.Bodies {
 		log.Infof("sending to %s ... ", hm.Rule.Url)

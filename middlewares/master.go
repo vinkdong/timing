@@ -19,6 +19,11 @@ type Rule struct {
 	Prometheus map[string]string
 }
 
+type Middleware interface {
+	Process()
+	Init(rule types.Rule)
+}
+
 var (
 	sysEnableMetrics = false
 )
@@ -62,4 +67,22 @@ func ProcessMiddleware(err error, resp *http.Response, r types.Rule, entity stri
 		}
 		reqDurationHistogram.WithLabelValues(r.Url,r.Method,entity,strconv.Itoa(resqCode)).Observe(time.Since(start).Seconds())
 	}
+}
+
+func SelectMiddleware(rule types.Rule) Middleware {
+	var hd Middleware
+	if rule.Type == "database" {
+		switch rule.Database.Type {
+		case "mysql":
+			hd = new(MysqlMiddleware)
+			break
+		default:
+			log.Errorf("can't find database of type %s", rule.Database.Type)
+		}
+	}
+	if rule.Type == "" || rule.Type == "http" {
+		hd = new(HttpMiddleware)
+	}
+	hd.Init(rule)
+	return hd
 }

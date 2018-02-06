@@ -55,8 +55,9 @@ func main() {
 func dealSend(r types.Rule) {
 	for {
 		if checkTimeIn(&r) {
-			s := middlewares.HttpMiddleware{Rule: r}
-			s.Process()
+			var middleware middlewares.Middleware
+			middleware = middlewares.SelectMiddleware(r)
+			middleware.Process()
 		}
 		d := getSleepTime(&r)
 		log.Infof("sleepy for %s", d.String())
@@ -179,7 +180,6 @@ func parseYaml(rList *[]types.Rule, filePath string) {
 	for _, single := range dataList {
 		r := types.Rule{}
 		err = yaml.Unmarshal(single, &r)
-		fmt.Println(err)
 		if err != nil {
 			log.Errorf("Parse config %s error", filePath)
 			os.Exit(128)

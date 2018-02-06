@@ -5,6 +5,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/vinkdong/gox/log"
+	"github.com/vinkdong/timing/types"
 )
 
 type MysqlMiddleware struct {
@@ -14,9 +15,18 @@ type MysqlMiddleware struct {
 	Username string
 	Password string
 	db       *sql.DB
+	Rule     types.Rule
 }
 
 const mysqlConnectScheme  = "%s:%s@tcp(%s:%d)/%s"
+
+func (m *MysqlMiddleware) Init(rule types.Rule) {
+	m.Rule = rule
+}
+
+func (m *MysqlMiddleware) Process() {
+
+}
 
 func (m *MysqlMiddleware) init() {
 	db, err := sql.Open("mysql", fmt.Sprintf(mysqlConnectScheme,

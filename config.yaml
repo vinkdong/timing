@@ -76,3 +76,7 @@ sql:
   execute:
     - INSERT INTO t01 (name, date) VALUES ("zhans",NOW());
   query:
+run_count: 10000
+run_thread: 4
+run_every:
+  seconds: 30
