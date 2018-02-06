@@ -3,7 +3,7 @@ package middlewares
 import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/vinkdong/asset-alarm/log"
+	"github.com/vinkdong/gox/log"
 	"net/http"
 )
 

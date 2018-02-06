@@ -30,9 +30,11 @@ range:
     lte: 13
 run_every:
   seconds: 30
-check:
+checker:
   - type: json
-    rule: this is rules
+    rule:
+      - $.status = "green"
+      - $.number_of_data_nodes = 2
 
 ---
 url: https://vinkdong.com

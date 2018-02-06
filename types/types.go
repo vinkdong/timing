@@ -1,7 +1,12 @@
 package types
 
 import (
-	"github.com/vinkdong/asset-alarm/log"
+	"github.com/vinkdong/gox/log"
+	"net/http"
+	"github.com/bitly/go-simplejson"
+	"text/template"
+	"bytes"
+	"fmt"
 )
 
 type Rule struct {
@@ -13,12 +18,29 @@ type Rule struct {
 	Every      map[string]int    `yaml:"run_every"`
 	LogResp    bool              `yaml:"log_response"`
 	Prometheus map[string]string
-	Check      []Check           `yaml: "check"`
+	Check      []Checker          `yaml: "checker"`
 }
 
-type Check struct {
+type Checker struct {
 	Type string `yaml:"type"`
-	Rule string `yaml:"rule"`
+	Name string `yaml:"name"`
+	Rule []string `yaml:"rule"`
+}
+
+func (c *Checker) Check(response http.Response) {
+
+}
+
+func (c *Checker) CheckJson(js *simplejson.Json) {
+
+	templ, err := template.New(c.Name).Parse("")
+	if err != nil{
+		log.Errorf("checker %s init failed", c.Name)
+	}
+	var tpl bytes.Buffer
+
+	templ.Execute(&tpl, js)
+	fmt.Println(tpl.String())
 }
 
 func (r *Rule) LogNotIn(period string) {
