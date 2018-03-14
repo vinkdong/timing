@@ -24,12 +24,9 @@ type Rule struct {
 	Type       string
 	Database   Database          `yaml:"database"`
 	Sql        TSql              `yaml: "sql"`
-	*Context
-}
-
-type Context struct {
-	Executed int64
-	Skip     bool
+	Executed   int64
+	Skip       bool
+	Started    int64
 }
 
 type Database struct {

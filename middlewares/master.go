@@ -21,7 +21,7 @@ type Rule struct {
 
 type Middleware interface {
 	Process()
-	Init(rule types.Rule)
+	Init(rule *types.Rule)
 }
 
 var (
@@ -69,7 +69,7 @@ func ProcessMiddleware(err error, resp *http.Response, r types.Rule, entity stri
 	}
 }
 
-func SelectMiddleware(rule types.Rule) Middleware {
+func SelectMiddleware(rule *types.Rule) Middleware {
 	var hd Middleware
 	if rule.Type == "database" {
 		switch rule.Database.Type {

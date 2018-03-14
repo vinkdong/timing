@@ -11,17 +11,17 @@ import (
 
 type HttpMiddleware struct {
 	Name string
-	Rule types.Rule
+	Rule *types.Rule
 }
 
-func (hm *HttpMiddleware) Init(rule types.Rule) {
+func (hm *HttpMiddleware) Init(rule *types.Rule) {
 	hm.Rule = rule
 }
 
 func (hm *HttpMiddleware) Process() {
 	for body := range hm.Rule.Bodies {
 		log.Infof("sending to %s ... ", hm.Rule.Url)
-		hm.SendRequest(hm.Rule, body)
+		hm.SendRequest(*hm.Rule, body)
 	}
 }
 

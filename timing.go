@@ -45,23 +45,27 @@ func main() {
 	middlewares.InitMiddleware(enableMetrics,addr,buckets)
 	parseYaml(&ruleList, *conf)
 	for _, r := range ruleList {
-		go dealSend(r)
+		var p = r
+		p.Started = time.Now().UnixNano()
+		go dealSend(&p)
 	}
 	for{
 		time.Sleep(time.Hour*10)
 	}
 }
 
-func dealSend(r types.Rule) {
+func dealSend(r *types.Rule) {
 	for {
-		if checkTimeIn(&r) {
+		if checkTimeIn(r) {
 			var middleware middlewares.Middleware
 			middleware = middlewares.SelectMiddleware(r)
 			middleware.Process()
 		}
-		d := getSleepTime(&r)
-		log.Infof("sleepy for %s", d.String())
-		time.Sleep(d)
+		d := getSleepTime(r)
+		if d > 0 {
+			log.Infof("sleepy for %s", d.String())
+			time.Sleep(d)
+		}
 	}
 }
 
@@ -70,6 +74,9 @@ func getSleepTime(r *types.Rule) time.Duration {
 	var duration time.Duration
 	if val, ok := every["seconds"]; ok {
 		duration = time.Duration(val) * time.Second
+	}
+	if val, ok := every["microsecond"]; ok {
+		duration = time.Duration(val) * time.Microsecond
 	}
 	if val, ok := every["minutes"]; ok {
 		duration += time.Duration(val) * time.Minute
@@ -84,6 +91,9 @@ func getSleepTime(r *types.Rule) time.Duration {
 }
 
 func checkTimeIn(r *types.Rule) bool{
+	if r.Skip{
+		return false
+	}
 	current := time.Now().UTC()
 	if rH := r.Range["month"]; rH != nil {
 		currentMonth := int(current.Month())
