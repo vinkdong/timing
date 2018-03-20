@@ -40,6 +40,7 @@ func main() {
 	flag.Parse()
 	if *help == true {
 		showHelp()
+		os.Exit(0)
 	}
 	ruleList := make([]types.Rule,0)
 	middlewares.InitMiddleware(enableMetrics,addr,buckets)
@@ -75,7 +76,7 @@ func getSleepTime(r *types.Rule) time.Duration {
 	if val, ok := every["seconds"]; ok {
 		duration = time.Duration(val) * time.Second
 	}
-	if val, ok := every["microsecond"]; ok {
+	if val, ok := every["microseconds"]; ok {
 		duration = time.Duration(val) * time.Microsecond
 	}
 	if val, ok := every["minutes"]; ok {
@@ -84,7 +85,7 @@ func getSleepTime(r *types.Rule) time.Duration {
 	if val, ok := every["hours"]; ok {
 		duration += time.Duration(val) * time.Hour
 	}
-	if val, ok := every["day"]; ok {
+	if val, ok := every["days"]; ok {
 		duration += time.Duration(val) * time.Hour * 24
 	}
 	return duration
@@ -173,11 +174,11 @@ func checkCondition(current int, condition map[string]int) bool {
 
 
 func showHelp() {
-	fmt.Printf(`%sTiming Request %sis used send request by timing
+	fmt.Printf(`%stiming %sis used send request by timing
 --conf  point a config file,must be yaml
 --help  show help information
 --version     show version
-Need more refer at  %shttps://github.com/VinkDong/TimingRequest%s
+Need more refer at  %shttps://github.com/vindong/timing%s
 `, CLR_Y, CLR_N, CLR_C, CLR_N)
 }
 

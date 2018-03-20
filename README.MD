@@ -11,7 +11,7 @@ Timing Request is used for send http request timing
 - get code
 
     ```bash
-    go get -v github.com/VinkDong/TimingRequest
+    go get -v github.com/vinkdong/timing
     ```
 
 - build execute file
@@ -27,7 +27,7 @@ Timing Request is used for send http request timing
   - url: address you want requested
   - method: request method you need
   - body: request body, if you have 2 or more bodies it will send with difference body
-  - range: special time period you want to send request, you can use `hour`,`minute`,`second`,`month` and `weekday`, from now,then you can use `gt`,`lt`,`gte`,`lte` and `eq` as condition,they're <span style="color:red">AND</span> relationship,Time is <span style="color:red">UTC</span> time, and Sunday in weekday is `0`, Monday is `1` by parity of reasoning.
+  - range: special time period you want to send request, you can use `hour`,`minute`,`second`,`microseconds`,`month` and `weekday`, from now,then you can use `gt`,`lt`,`gte`,`lte` and `eq` as condition,they're <span style="color:red">AND</span> relationship,Time is <span style="color:red">UTC</span> time, and Sunday in weekday is `0`, Monday is `1` by parity of reasoning.
   - run_every: interval time for wait next request, you can use `seconds`,`minutes`,`hours` and `days`,if there have 2 or more, they're <span style="color:red">AND</span> relationship too.
   - log_response: whether log response body
 
@@ -36,7 +36,7 @@ Timing Request is used for send http request timing
 - start program
 
     ```bash
-    ./TimingRequest --conf path/your/config
+    ./timing --conf path/your/config
     ```
 
 BTW, your can use `--help` to display help information
@@ -48,7 +48,7 @@ you can monitoring this process via prometheus, this is a experimental
 - start with prometheus monitoring
 
     ```bash
-    .TimingRequest --conf path/your/config -enable_metrics --addr :9800
+    .timing --conf path/your/config -enable_metrics --addr :9800
     ```
 
 - additional arguments
