@@ -7,11 +7,15 @@ import (
 	"io/ioutil"
 	"github.com/vinkdong/timing/types"
 	"github.com/vinkdong/gox/log"
+	"github.com/vinkdong/timing/common"
+	"compress/gzip"
+	"io"
 )
 
 type HttpMiddleware struct {
-	Name string
-	Rule *types.Rule
+	Name     string
+	Rule     *types.Rule
+	Template common.VTemplate
 }
 
 func (hm *HttpMiddleware) Init(rule *types.Rule) {
@@ -28,6 +32,8 @@ func (hm *HttpMiddleware) Process() {
 func (hm *HttpMiddleware) SendRequest(r types.Rule, entity string) {
 	client := &http.Client{}
 	body := r.Bodies[entity]
+	r.Url = hm.Template.Execute(r.Url)
+	body = hm.Template.Execute(body)
 	req, err := http.NewRequest(r.Method, r.Url, strings.NewReader(body))
 	for k , v := range r.Headers{
 		req.Header.Set(k,v)
@@ -42,8 +48,23 @@ func (hm *HttpMiddleware) SendRequest(r types.Rule, entity string) {
 	if err != nil {
 		return
 	}
-	data, err := ioutil.ReadAll(resp.Body)
+	
 	if r.LogResp {
+		var r io.Reader
+		switch resp.Header.Get("Content-Encoding") {
+		case "gzip":
+			r , err = gzip.NewReader(resp.Body)
+			if err != nil{
+				log.Error(err)
+			}
+		default:
+			r = resp.Body
+		}
+
+		data, err := ioutil.ReadAll(r)
+		if err != nil{
+			log.Error(err)
+		}
 		log.Infof("%s", data)
 	}
 }
