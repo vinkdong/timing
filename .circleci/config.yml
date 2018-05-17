@@ -3,7 +3,7 @@ jobs:
    build:
      docker:
        - image: circleci/golang:1.8
-     working_directory: /go/src/github.com/VinkDong/TimingRequest
+     working_directory: /go/src/github.com/vinkdong/timing
 
      steps:
        - checkout
