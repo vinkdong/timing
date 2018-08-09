@@ -45,10 +45,10 @@ func main() {
 		os.Exit(0)
 	}
 	go fileWatch()
+	middlewares.InitMiddleware(enableMetrics, addr, buckets)
 
 start:
 	ruleList := make([]types.Rule, 0)
-	middlewares.InitMiddleware(enableMetrics, addr, buckets)
 	parseYaml(&ruleList, *conf)
 
 	outSignal := make(chan int)
