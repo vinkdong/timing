@@ -1,6 +1,6 @@
 # Timing Request
 
-[![Circle CI](https://circleci.com/gh/VinkDong/TimingRequest/tree/master.svg?style=shield)](https://circleci.com/gh/VinkDong/TimingRequest/tree/master)
+[![Circle CI](https://circleci.com/gh/vinkdong/timing/tree/master.svg?style=shield)](https://circleci.com/gh/vinkdong/timing/tree/master)
 
 ## Introduction
 
