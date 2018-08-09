@@ -11,6 +11,8 @@ import (
 	"os"
 	"github.com/vinkdong/timing/middlewares"
 	"github.com/vinkdong/timing/types"
+	"github.com/fsnotify/fsnotify"
+	"github.com/golang/glog"
 )
 
 const CLR_0 = "\x1b[30;1m"
@@ -23,17 +25,18 @@ const CLR_M = "\x1b[35;1m"
 const CLR_C = "\x1b[36;1m"
 const CLR_W = "\x1b[37;1m"
 const VERSION = "v0.1.0"
+const reloadConfig = 5
+const systemDown = 0
 
 var (
-	conf       = flag.String("conf", "", "Timing request config file")
-	help       = flag.Bool("help", false, "Show help information")
+	conf          = flag.String("conf", "", "Timing request config file")
+	help          = flag.Bool("help", false, "Show help information")
 	enableMetrics = flag.Bool("enable_metrics", false, "Provide prometheus metrics")
-	addr       = flag.String("addr", ":9800", "The address to listen on for HTTP requests.")
-	buckets    = flag.String("buckets", "0.1, 0.3, 1.2, 5.0", "Buckets holds Prometheus Buckets")
+	addr          = flag.String("addr", ":9800", "The address to listen on for HTTP requests.")
+	buckets       = flag.String("buckets", "0.1, 0.3, 1.2, 5.0", "Buckets holds Prometheus Buckets")
 )
 
-
-
+var signalHandler = make(chan int)
 
 func main() {
 	flag.Parse()
@@ -41,31 +44,91 @@ func main() {
 		showHelp()
 		os.Exit(0)
 	}
-	ruleList := make([]types.Rule,0)
-	middlewares.InitMiddleware(enableMetrics,addr,buckets)
+	go fileWatch()
+
+start:
+	ruleList := make([]types.Rule, 0)
+	middlewares.InitMiddleware(enableMetrics, addr, buckets)
 	parseYaml(&ruleList, *conf)
+
+	outSignal := make(chan int)
+
 	for _, r := range ruleList {
 		var p = r
 		p.Started = time.Now().UnixNano()
-		go dealSend(&p)
+		go dealSend(&p, outSignal)
 	}
-	for{
-		time.Sleep(time.Hour*10)
+	sig := <-signalHandler
+	if sig == 0 {
+		os.Exit(0)
+	} else if sig == reloadConfig {
+		log.Info("notify config changed")
+		go func() {
+			outSignal <- reloadConfig
+		}()
+		log.Info("Restart timing...")
+		goto start
 	}
 }
 
-func dealSend(r *types.Rule) {
+func fileWatch() {
+
+restart:
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Error(err)
+	}
+	defer watcher.Close()
+
+	err = watcher.Add(*conf)
+	if err != nil {
+		glog.Error(err)
+		goto restart
+	}
 	for {
-		if checkTimeIn(r) {
-			var middleware middlewares.Middleware
-			middleware = middlewares.SelectMiddleware(r)
-			middleware.Process()
+		select {
+		case event := <-watcher.Events:
+			if event.Op&fsnotify.Rename == fsnotify.Rename {
+				watcher.Close()
+				log.Info("restarting watch file")
+				signalHandler <- reloadConfig
+				goto restart
+			}
+			if event.Op&fsnotify.Write == fsnotify.Write {
+				signalHandler <- reloadConfig
+			}
+		case <-watcher.Errors:
+			log.Error("watch config error")
+			log.Error(err)
 		}
-		d := getSleepTime(r)
-		if d > 0 {
-			log.Infof("sleepy for %s", d.String())
-			time.Sleep(d)
+	}
+
+}
+
+func dealSend(r *types.Rule, stopCh <-chan int) {
+loop:
+	for {
+		select {
+		case sig := <-stopCh:
+			if sig == 0 {
+				os.Exit(0)
+			} else if sig == reloadConfig {
+				break loop
+			}
+
+		default:
+			if checkTimeIn(r) {
+				var middleware middlewares.Middleware
+				middleware = middlewares.SelectMiddleware(r)
+				middleware.Process()
+			}
+			d := getSleepTime(r)
+			if d > 0 {
+				log.Infof("sleepy for %s", d.String())
+				time.Sleep(d)
+			}
 		}
+
 	}
 }
 
@@ -90,14 +153,14 @@ func getSleepTime(r *types.Rule) time.Duration {
 	return duration
 }
 
-func checkTimeIn(r *types.Rule) bool{
-	if r.Skip{
+func checkTimeIn(r *types.Rule) bool {
+	if r.Skip {
 		return false
 	}
 	current := time.Now().UTC()
 	if rH := r.Range["month"]; rH != nil {
 		currentMonth := int(current.Month())
-		if !checkCondition(currentMonth, rH){
+		if !checkCondition(currentMonth, rH) {
 			r.LogNotIn("month")
 			return false
 		}
@@ -105,7 +168,7 @@ func checkTimeIn(r *types.Rule) bool{
 	}
 	if rH := r.Range["weekday"]; rH != nil {
 		currentWeekday := int(current.Weekday())
-		if !checkCondition(currentWeekday, rH){
+		if !checkCondition(currentWeekday, rH) {
 			r.LogNotIn("weekday")
 			return false
 		}
@@ -113,7 +176,7 @@ func checkTimeIn(r *types.Rule) bool{
 	}
 	if rH := r.Range["hour"]; rH != nil {
 		currentHour := current.Hour()
-		if !checkCondition(currentHour, rH){
+		if !checkCondition(currentHour, rH) {
 			r.LogNotIn("hour")
 			return false
 		}
@@ -121,14 +184,14 @@ func checkTimeIn(r *types.Rule) bool{
 	}
 	if rH := r.Range["minute"]; rH != nil {
 		currentMinute := current.Minute()
-		if !checkCondition(currentMinute, rH){
+		if !checkCondition(currentMinute, rH) {
 			r.LogNotIn("minute")
 			return false
 		}
 	}
 	if rH := r.Range["second"]; rH != nil {
 		currentSecond := current.Second()
-		if !checkCondition(currentSecond, rH){
+		if !checkCondition(currentSecond, rH) {
 			r.LogNotIn("second")
 			return false
 		}
@@ -138,39 +201,37 @@ func checkTimeIn(r *types.Rule) bool{
 
 func checkCondition(current int, condition map[string]int) bool {
 	if v, ok := condition["gt"]; ok {
-		if current <= v{
+		if current <= v {
 			return false
 		}
 	}
 
 	if v, ok := condition["gte"]; ok {
-		if current < v{
+		if current < v {
 			return false
 		}
 	}
 
 	if v, ok := condition["lt"]; ok {
-		if current >= v{
+		if current >= v {
 			return false
 		}
 	}
 
 	if v, ok := condition["lte"]; ok {
-		if current > v{
+		if current > v {
 			return false
 		}
 	}
 
 	if v, ok := condition["eq"]; ok {
-		if current != v{
+		if current != v {
 			return false
 		}
 	}
 
 	return true
 }
-
-
 
 func showHelp() {
 	fmt.Printf(`%stiming %sis used send request by timing
