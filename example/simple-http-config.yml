@@ -1,0 +1,28 @@
+---
+url: https://vinkdong.com/{{ .RenderRelativeTime "now-15h" "2006-01-02" }}
+method: GET
+header:
+  Accept: application/json, text/plain, */*
+  Referer: http://vinkdong.com/
+body:
+  bodyone2: |
+    {
+      "properties": {
+        "ServerIP": {
+          "type":     "text",
+          "fielddata": true
+        }
+      }
+    }
+range:
+  hour:
+    gte: 1
+    lte: 16
+  month:
+    gte: 8
+    lte: 12
+  weekday:
+    gte: 0
+    lte: 5
+run_every:
+  seconds: 30

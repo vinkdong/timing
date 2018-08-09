@@ -23,16 +23,22 @@ func (hm *HttpMiddleware) Init(rule *types.Rule) {
 }
 
 func (hm *HttpMiddleware) Process() {
+	// render template
+	hm.Rule.Url = hm.Template.Execute(hm.Rule.Url)
 	for body := range hm.Rule.Bodies {
-		log.Infof("sending to %s ... ", hm.Rule.Url)
+		log.Infof("%s to %s ... ", hm.Rule.Method, hm.Rule.Url)
 		hm.SendRequest(*hm.Rule, body)
 	}
 }
 
+/**
+send http request
+ */
 func (hm *HttpMiddleware) SendRequest(r types.Rule, entity string) {
 	client := &http.Client{}
 	body := r.Bodies[entity]
-	r.Url = hm.Template.Execute(r.Url)
+
+	//render template
 	body = hm.Template.Execute(body)
 	req, err := http.NewRequest(r.Method, r.Url, strings.NewReader(body))
 	for k , v := range r.Headers{

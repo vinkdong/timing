@@ -4,6 +4,11 @@ import (
 	"regexp"
 	"fmt"
 	"strings"
+	"text/template"
+	"github.com/vinkdong/asset-alarm/log"
+	"github.com/vinkdong/gox/vtime"
+	"bytes"
+	"time"
 )
 
 const templateSpec = "vk.[a-z].[a-z]+(\\{[a-z0-9A-Z\\.]+\\})?"
@@ -14,6 +19,7 @@ type VTemplate struct {
 	origin   string
 	result   string
 	register map[string]string
+	Time     vtime.Time
 }
 
 type Register struct {
@@ -22,11 +28,40 @@ type Register struct {
 	next  string
 }
 
+func (t *VTemplate) RenderTime(format string) string {
+	return time.Now().Format(format)
+}
+
+func (t *VTemplate) RenderRelativeTime(formula, format string) string {
+	vt := vtime.Time{}
+	vt.FromRelativeTime(formula)
+	return vt.Time.Format(format)
+}
+
+
 func (t *VTemplate) Execute(origin string) string {
 	if checkTemplate(origin){
 		t.execute(origin)
 	}
-	return origin
+	return t.renderOriginTemplate(origin)
+}
+
+/**
+use official template
+ */
+func (t *VTemplate) renderOriginTemplate(origin string) string {
+	tmpl, err := template.New("origin").Parse(origin)
+	if err != nil {
+		log.Error(err)
+		return origin
+	}
+	br := &bytes.Buffer{}
+	err = tmpl.Execute(br, t)
+	if err != nil {
+		log.Error(err)
+		return origin
+	}
+	return br.String()
 }
 
 func (t *VTemplate) execute(origin string) string {
@@ -84,5 +119,5 @@ func randomString(string, end string) {
 
 func RegisterTemplate(origin string) ([]string, [][]int) {
 	reg := regexp.MustCompile(TEMPLATE)
-	return  reg.FindAllString(origin, -1), reg.FindAllStringIndex(origin, -1)
+	return reg.FindAllString(origin, -1), reg.FindAllStringIndex(origin, -1)
 }

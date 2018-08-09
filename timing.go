@@ -30,7 +30,6 @@ var (
 	enableMetrics = flag.Bool("enable_metrics", false, "Provide prometheus metrics")
 	addr       = flag.String("addr", ":9800", "The address to listen on for HTTP requests.")
 	buckets    = flag.String("buckets", "0.1, 0.3, 1.2, 5.0", "Buckets holds Prometheus Buckets")
-
 )
 
 
