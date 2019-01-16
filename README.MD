@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Timing Request is used for send http request timing
+Timing is used for send http request timing
 
 ## Quick Start
 

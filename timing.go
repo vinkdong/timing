@@ -138,6 +138,9 @@ func getSleepTime(r *types.Rule) time.Duration {
 	if val, ok := every["seconds"]; ok {
 		duration = time.Duration(val) * time.Second
 	}
+	if val, ok := every["milliseconds"]; ok {
+		duration = time.Duration(val) * time.Millisecond
+	}
 	if val, ok := every["microseconds"]; ok {
 		duration = time.Duration(val) * time.Microsecond
 	}

@@ -29,6 +29,10 @@ func (hm *HttpMiddleware) Process() {
 		log.Infof("%s to %s ... ", hm.Rule.Method, hm.Rule.Url)
 		hm.SendRequest(*hm.Rule, body)
 	}
+	if len(hm.Rule.Bodies) == 0 {
+		log.Infof("%s to %s ... ", hm.Rule.Method, hm.Rule.Url)
+		hm.SendRequest(*hm.Rule, "")
+	}
 }
 
 /**
@@ -41,8 +45,8 @@ func (hm *HttpMiddleware) SendRequest(r types.Rule, entity string) {
 	//render template
 	body = hm.Template.Execute(body)
 	req, err := http.NewRequest(r.Method, r.Url, strings.NewReader(body))
-	for k , v := range r.Headers{
-		req.Header.Set(k,v)
+	for k, v := range r.Headers {
+		req.Header.Set(k, v)
 	}
 	if err != nil {
 		log.Error(err)
@@ -54,13 +58,13 @@ func (hm *HttpMiddleware) SendRequest(r types.Rule, entity string) {
 	if err != nil {
 		return
 	}
-	
+
 	if r.LogResp {
 		var r io.Reader
 		switch resp.Header.Get("Content-Encoding") {
 		case "gzip":
-			r , err = gzip.NewReader(resp.Body)
-			if err != nil{
+			r, err = gzip.NewReader(resp.Body)
+			if err != nil {
 				log.Error(err)
 			}
 		default:
@@ -68,7 +72,7 @@ func (hm *HttpMiddleware) SendRequest(r types.Rule, entity string) {
 		}
 
 		data, err := ioutil.ReadAll(r)
-		if err != nil{
+		if err != nil {
 			log.Error(err)
 		}
 		log.Infof("%s", data)
