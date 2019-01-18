@@ -103,14 +103,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:cc02b9d5403486f563c947ef0e696d8e54ff338af70f0a5c967924e9806d56f2"
-  name = "github.com/vinkdong/asset-alarm"
-  packages = ["log"]
-  pruneopts = "UT"
-  revision = "feed0e7d6a08dd5e6ce7ed93f52937e870e70cd5"
-
-[[projects]]
-  branch = "master"
   digest = "1:baa21db0599f1d9148c0a3b85483f99af087462b2472874f188c08bd93ca0698"
   name = "github.com/vinkdong/gox"
   packages = [
@@ -154,7 +146,6 @@
     "github.com/golang/glog",
     "github.com/prometheus/client_golang/prometheus",
     "github.com/prometheus/client_golang/prometheus/promhttp",
-    "github.com/vinkdong/asset-alarm/log",
     "github.com/vinkdong/gox/log",
     "github.com/vinkdong/gox/vtime",
     "gopkg.in/yaml.v2",

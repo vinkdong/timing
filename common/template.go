@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"text/template"
-	"github.com/vinkdong/asset-alarm/log"
+	"github.com/vinkdong/gox/log"
 	"github.com/vinkdong/gox/vtime"
 	"bytes"
 	"time"
